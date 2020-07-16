@@ -40,12 +40,34 @@ $wait=%random(1,20)*100
 
 //triggers
 #TR {Party say from @PartyLeader:%s{"trig on|tron"}$} {trigger on;party say trigger on} $CLASS
+
 #TR {Party say from @PartyLeader:%s{"trig off|troff"}$} {trigger off;party say trigger off} $CLASS
-#TR {Party say from @PartyLeader:%s{"trig|trigger"}?$} {#T+ triggerStatus;#T+ triggerReport1;#T+ triggerReport2;trigger} $CLASS
-#TR triggerStatus {Your trigger is deactivated.} {#T- triggerStatus;party say trigger is currently deactivated.} $CLASS
-#TR triggerReport1 {(The next time you see '%2', you will do: '%3'.)} {#T- triggerReport1;party say Current trigger: %1} $CLASS
-#TR triggerReport2 {(Current trigger: '%2' todo '%3')} {#T- triggerReport2;party say Current trigger: %1} $CLASS
-#T- triggerStatus;#T- triggerReport1;#T- triggerReport2
+
+#TR {Party say from @PartyLeader:%s{"trig|trigger"}?$} {
+#T+ TriggerStatus
+#T+ TriggerReport1
+#T+ TriggerReport2
+trigger
+} $CLASS
+
+#TR TriggerStatus {Your trigger is deactivated.} {
+#T- TriggerStatus
+party say trigger is currently deactivated.
+} $CLASS
+
+#TR TriggerReport1 {(The next time you see '%2', you will do: '%3'.)} {
+#T- TriggerReport1
+party say Current trigger: %1
+} $CLASS
+
+#TR TriggerReport2 {(Current trigger: '%2' todo '%3')} {
+#T- TriggerReport2
+party say Current trigger: %1
+} $CLASS
+
+#T- TriggerStatus
+#T- TriggerReport1
+#T- TriggerReport2
 
 #TR {Party say from @PartyLeader:%strigbleed$} {trigger is bleeding todo kill} $CLASS
 #TR {Party say from @PartyLeader:%s{"go busy|gobusy"}$} {trigger You todo gold} $CLASS
