@@ -1,0 +1,216 @@
+#CLASS 0
+#VAR PartyBitch {} {} VAR
+#VAR Mobs_Generic {"guard|sentry|man|archer|orc|elf|troll|variag|numenorean|olog|uruk|wolf|dwarf|scout"} {} VAR
+
+#VAR PartyLeader_Que_Emote {"nodnod|hop|wait|bap me|hop me"} {} VAR
+#VAR Messages_PartyLeader_Que {"nodnods.|hops.|waits.|baps himself across the forehead.|baps herself across the forehead.|baps you across the forehead.|hops onto himself and shouts: GIDDYAP!!  YEEHAW!|nods at you."} {} VAR
+#VAR Messages_Profatk_Que {"farts at|scoffs at|mehs at|hehs at|kisses|marks|lets loose a noisome stench!|throws up his arm, blowing kisses to the crowd.|throws up her arms, blowing kisses to the crowd."} {} VAR
+
+$CLASS = "Tools|PartyBitch|Settings"
+
+#TR {@PartyLeader {@Messages_PartyLeader_Que}} {
+$depo=0
+$roomID=%lower(%roomid())
+$wait = %random(1,3)*1000
+#WAIT $wait
+#SW (%ismember($roomID,%lower(@ROOMS_Banks_ID))) {
+  $depo=%random(5,9)*20
+  #EXE {deposit all but $depo}
+} (%ismember($roomID,%lower(@ROOMS_Shops_ID))) {
+  SellAll
+} {HealHere}
+} $CLASS
+
+#TR {@PartyLeader {@Messages_Profatk_Que}} {profatk} $CLASS
+
+#TR {Party say from @PartyLeader:%ssync{" up|"}$} {
+#FIND
+$action="ok|nod|nodnod|party say ok|party say done"
+$wait=%random(1,20)*100
+#WAIT $wait
+#EXE {%item($action,%random(1,%numitems($action)))}
+} $CLASS
+
+#TR {Party say from @PartyLeader:%ssync to %1} {TE %1} $CLASS
+
+#TR {Party say from @PartyLeader: {"ap|allow|allow party"}} {allow party} $CLASS
+
+#TR {You are not in a party.} {bitchoff} $CLASS
+
+
+//triggers
+#TR {Party say from @PartyLeader:%s{"trig on|tron"}$} {trigger on;party say trigger on} $CLASS
+#TR {Party say from @PartyLeader:%s{"trig off|troff"}$} {trigger off;party say trigger off} $CLASS
+#TR {Party say from @PartyLeader:%s{"trig|trigger"}?$} {#T+ triggerStatus;#T+ triggerReport1;#T+ triggerReport2;trigger} $CLASS
+#TR triggerStatus {Your trigger is deactivated.} {#T- triggerStatus;party say trigger is currently deactivated.} $CLASS
+#TR triggerReport1 {(The next time you see '%2', you will do: '%3'.)} {#T- triggerReport1;party say Current trigger: %1} $CLASS
+#TR triggerReport2 {(Current trigger: '%2' todo '%3')} {#T- triggerReport2;party say Current trigger: %1} $CLASS
+#T- triggerStatus;#T- triggerReport1;#T- triggerReport2
+
+#TR {Party say from @PartyLeader:%strigbleed$} {trigger is bleeding todo kill} $CLASS
+#TR {Party say from @PartyLeader:%s{"go busy|gobusy"}$} {trigger You todo gold} $CLASS
+#TR {Party say from @PartyLeader:%s{"go busy|gobusy"} {"wc|warcry"}$} {trigger You todo do gold,warcry,party hp;nodnod} $CLASS
+#TR {Party say from @PartyLeader:%s{"gobusywc|busywc"}$} {trigger You todo do gold,warcry,party hp;nodnod} $CLASS
+#TR {Party say from @PartyLeader:%strigger %1 todo %2} {#WAIT 1000;trigger %1 todo %2} $CLASS
+#TR {Party say from @PartyLeader:%strigy %1$} {trigger Y todo kill %1} $CLASS
+#TR {Party say from @PartyLeader:%strigga$} {Party_TrigGA} $CLASS
+#TR {Party say from @PartyLeader:%strigarch$} {TrigArch} $CLASS
+#TR {Party say from @PartyLeader:%stht$} {#IF (%lower(@MyProf)="assassin") {#T+ triggerReport1;THT}} $CLASS
+#TR {Party say from @PartyLeader:%stst$} {#IF (%lower(@MyProf)="wizard") {#T+ triggerReport;TST}} $CLASS
+#TR {Party say from @PartyLeader:%stkt$} {#T+ triggerReport1;TKT} $CLASS
+#TR {Party say from @PartyLeader:%stfb$} {#IF (%lower(@MyProf)="wizard") {#T+ triggerReport1;TFB}} $CLASS
+
+#TR {Party say from @PartyLeader:%sPKSTAT: Target: %1$} {tar %lower(%1);party say my target: @Tar;#T+ triggerReport1} $CLASS
+#TR {Party say from someone:%sPKSTAT: Target: %1$} {party say hold on, can't see;#10 {es}} $CLASS
+
+//Gold
+#TR {Party say from @PartyLeader:%s{"psa|split"}$} {party split all} $CLASS
+#TR {Party say from @PartyLeader:%s{"pas|party autosplit"} %1$} {party autosplit %1} $CLASS
+#TR {Party say from @PartyLeader:%ssell$} {#WAIT 100;sall;ok} $CLASS
+#TR {Party say from @PartyLeader:%spelsell$} {#WAIT 100;ok;#WAIT 1000;pelsell;ok;#T+ checkgold;gold} $CLASS
+#TR {Party say from @PartyLeader:%Skadsell$} {#WAIT 100;ok;#WAIT 1000;kadsell;ok;#T+ checkgold;gold} $CLASS
+#TR {Party say from @PartyLeader:%ssgsell$} {#WAIT 100;ok;#WAIT 1000;sgsell;ok;#T+ checkgold;gold} $CLASS
+
+#TR {Party say from @PartyLeader:%sloot$} {#WAIT 1000;GALL} $CLASS
+#TR {Party say from @PartyLeader:%sgive %1 to %2} {#WAIT 1000;give %2 to %3} $CLASS
+#TR {Party say from @PartyLeader:%s%1, give %2 to %3} {#IF (%lower(@MyName)=%lower(%1)) {#WAIT 1000;give %2 to %3}} $CLASS
+#TR {Party say from @PartyLeader:%swithdraw (%d)$} {withdraw %1;nod} $CLASS
+#TR {Party say from @PartyLeader:%s{"deposit|depo"}} {
+#WAIT 500;deposit all but 101
+$str="ok|nod|nodnod|ok|hop"
+#EXE {%item($str,%random((%numitems($str))))}
+} $CLASS
+
+
+#TR {You drunkenly search and find %d gold.} {#T+ CheckGold;gold} $CLASS
+#TR {Party say from @PartyLeader:%s{"gold|how much gold do you have|how much gold you got"}{"?|"}$} {#T+ CheckGold;gold} $CLASS
+#TR CheckGold {You search your pockets and find (%d) gold.} {party say I have %1 gold;#T- CheckGold} $CLASS
+
+
+//Gear & Items
+#TR {Party say from @PartyLeader:%swear %1$} {do wear %1,tag %1} $CLASS
+#TR {Party say from @PartyLeader:%s%1, wear %2$} {#IF (%lower(@MyName)=%lower(%1)) {do wear %2,tag %2}} $CLASS
+
+#TR {Party say from @PartyLeader:%swield %1$} {do wield %1,double wield,tag %1} $CLASS
+#TR {Party say from @PartyLeader:%s%1, wield %2$} {#IF (%lower(@MyName)=%lower(%1)) {do wield %2,double wield,tag %2}} $CLASS
+
+#TR {Party say from @PartyLeader:%s({"drop|get"}) %2$} {#WAIT 1000;%1 %2} $CLASS
+#TR {Party say from @PartyLeader:%s%1, ({"drop|get"}) %3$} {#IF (%lower(@MyName)=%lower(%1)) {#WAIT 1000;%2 %3}} $CLASS
+
+#TR {Party say from @PartyLeader:%sremove %1$} {remove %1} $CLASS
+#TR {Party say from @PartyLeader:%s%1remove %2$} {#IF (%lower(@MyName)=%lower(%1)) {remove %2}} $CLASS
+
+#TR {Party say from @PartyLeader:%s{"give me|gimme"} %1$} {#WAIT 1000;give %1 to %lower(@PartyLeader)} $CLASS
+#TR {Party say from @PartyLeader:%s%1, {"give me|gimme"} %2$} {#IF (%lower(@MyName)=%lower(%1)) {#WAIT 1000;give %2 to %lower(@PartyLeader)}} $CLASS
+
+#TR {Party say from @PartyLeader:%s{"ws|wield"}$} {ws} $CLASS
+#TR {Party say from @PartyLeader:%sdraw$} {ws} $CLASS
+#TR {Party say from @PartyLeader:%s{"sheath|ss"}$} {ss} $CLASS
+
+#TR {Party say from @PartyLeader:%s{"fs|staff"}$} {#IF (%ismember(@MyProf,@casters)) {#IF (@wep=staff) {ws} {hold staff}}} $CLASS
+#TR {Party say from @PartyLeader:%s{"sf|store staff"}$} {#IF (%ismember(%lower(@MyProf),%lower(@casters))) {store staff}} $CLASS
+
+#TR {Party say from @PartyLeader:%saimon$} {aimon} $CLASS
+#TR {Party say from @PartyLeader:%saimoff$} {aimoff} $CLASS
+#TR {Party say from @PartyLeader:%sgoldon$} {rw;goldon;ww} $CLASS
+#TR {Party say from @PartyLeader:%sgoldoff$} {goldoff} $CLASS
+#TR {Party say from @PartyLeader:%sallow me$} {allow %lower(@PartyLeader)} $CLASS
+
+
+//Sight
+#TR {Party say from @PartyLeader:%s{"eaglesight|attune"} %0$} {SIGHT ON} $CLASS
+#TR {Party say from @PartyLeader:%scast dark$} {2extinguish crystal;#SW (@MyProf=necromancer) {conjure cloak} (@MyProf=wizard) {cast dark}}  Tools|PartyBitch|Settings
+#TR {Party say from @PartyLeader:%scast light$} {light crystal;#SW (@MyProf=necromancer) {conjure flames} (@MyProf=wizard) {cast light}}  Tools|PartyBitch|Settings
+#TR {Party say from @PartyLeader:%sdark off$} {#IF (%ismember(@MyProf,@casters)) {cease dark};darkon}  Tools|PartyBitch|Settings
+#TR {Party say from @PartyLeader:%sdark on$} {#IF (%ismember(@MyProf,@casters)) {cease dark};darkoff}  Tools|PartyBitch|Settings
+
+#TR {Party say from @PartyLeader:%slight off$} {2extinguish crystal;#IF (%ismember(@MyProf,@casters)) {cease light}}  Tools|PartyBitch|Settings
+#TR {Party say from @PartyLeader:%s{"light|lite|crystal|lc"}{"|on"}$} {light crystal}  Tools|PartyBitch|Settings
+
+//Combat
+#TR {@PartyLeader {@Messages_Profatk_Que}} {#WAIT 1000;profatk} $CLASS
+
+#TR {Party say from @PartyLeader:%s{"kill|k"}{" (*)|"}$} {#IF (%1) {kill %1} {kill}} $CLASS
+#TR {Party say from @PartyLeader:%s({@Mobs_Generic}){" (%d)|"}$} {#IF (%2) {kill %1 %2} {kill %1}} $CLASS
+#TR {Party say from @PartyLeader:%sset target %1$} {tar %lower(%1);party say Target set: @Tar} $CLASS
+#TR {Party say from @PartyLeader:%sstatus$} {party hp;partysay Target: @Tar} $CLASS
+#TR {Party say from @PartyLeader:%saimon$} {aimon} $CLASS
+#TR {Party say from @PartyLeader:%saimoff$} {aimoff} $CLASS
+#TR {Party say from @PartyLeader:%s{"salvage|sv|sal"}$} {#IF (@MyProf=archer) {sv}} $CLASS
+//#TR {bleeding to death} {kill} PartyBitch|Settings
+#TR {@PartyLeader attacks %1.$} {$wait=%random(2,6)*1000;#WAIT $wait;profatk} $CLASS
+#TR {Party say from @PartyLeader:%s({"wimpy|wimpy on|wimpy off"})$} {%lower(%1)} $CLASS
+
+
+//Profession specials
+#TR {Party say from @PartyLeader:%sbarkskin$} {#IF (@MyProf=wizard) {cast barkskin}} $CLASS
+#TR {Party say from @PartyLeader:%s{"fb|fireball"}$} {#IF (@MyProf=wizard) {cast fireball}} $CLASS
+#TR {Party say from @PartyLeader:%s{"fb|fireball"} %1$} {#IF (@MyProf=wizard) {cast fireball at %1}} $CLASS
+#TR {Party say from @PartyLeader:%szap$} {#SW (@MyProf=wizard) {cast lightning} (@MyProf=necromancer) {cast hurricane}} $CLASS
+#TR {Party say from @PartyLeader:%sleech %1$} {#IF (@MyProf=necromancer) {leech %1}} $CLASS
+#TR {Party say from @PartyLeader:%sleech$} {#IF (@MyProf=necromancer) {leech}} $CLASS
+#TR {Party say from @PartyLeader:%s{"hb|headbutt"} %1$} {#IF (@MyProf=warrior) {headbutt %1}} $CLASS
+#TR {Party say from @PartyLeader:%s{"hb|headbutt"}$} {#IF (@MyProf=warrior) {headbutt}} $CLASS
+#TR {Party say from @PartyLeader:%sshiv %1$} {#IF (@MyProf=sniffer) {shiv %1}} $CLASS
+#TR {Party say from @PartyLeader:%sshiv$} {#IF (@MyProf=sniffer) {shiv}} $CLASS
+#TR {Party say from @PartyLeader:%sprowl$} {#IF (@MyProf=sniffer) {prowl}} $CLASS
+#TR {Party say from @PartyLeader:%s{"warcry|wc"}$} {#IF (@MyProf=rider) {warcry}} $CLASS
+#TR {Party say from @PartyLeader:%shunt %1$} {#IF (@MyProf=assassin) {hunt %1}} $CLASS
+#TR {Party say from @PartyLeader:%scamouflage$} {#IF (@MyProf=assassin) {camouflage}} $CLASS
+#TR {Party say from @PartyLeader:%camo$} {#IF (@MyProf=assassin) {camouflage}} $CLASS
+
+//Health
+#TR {You notice @PartyLeader sizing you up.} {#WAIT %random(1,3)*1000;party hp} $CLASS
+#TR {Party say from @PartyLeader:%s{"pp|party prot|party protect"}$} {party protect} $CLASS
+#TR {Party say from @PartyLeader:%s{"prot|pro"} %1$} {#IF (%1="me") {protect %lower(@PartyLeader)} {protect %lower(%1)}} $CLASS
+#TR {Party say from @PartyLeader:%s{"prot|pro"}$} {protect %lower(@PartyLeader)} $CLASS
+#TR {Party say from @PartyLeader:%sshield %1$} {#IF (%1="me") {shield %lower(@PartyLeader)} {shield %lower(%1)}} $CLASS
+#TR {Party say from @PartyLeader:%sunshield$} {unshield all} $CLASS
+#TR {Party say from @PartyLeader:%s{"unprot|unpro|unall"}$} {do unprotect all,unshield all} $CLASS
+#TR {Party say from @PartyLeader:%s{"unprot|unpro"} %1$} {#IF (%1=me) {unprotect %lower(@PartyLeader)} {unprotect %lower(%1)}} $CLASS
+#TR {Party say from @PartyLeader:%sphp$} {PHP} $CLASS
+
+//Healing
+#TR {Party say from @PartyLeader:%sheal up$} {#WAIT 500;HealHere} $CLASS
+//#TR {@PartyLeader nodnods.} {#WAIT 500;HealHere} PartyBitch|Settings
+
+#TR {Party say from @PartyLeader:%s{"heal|rh|request healing"}$} {ok;request healing;php} $CLASS
+#TR {Party say from @PartyLeader:%s({"eat|drink"}) %2$} {%1 %2;party hp} $CLASS
+#TR {Party say from @PartyLeader:%sdh!$} {DH} $CLASS
+#TR {Party say from @PartyLeader:%s{"flask|bota"}!$} {rw;do open bag,get draught from bag,get draught from cloak,get draught from pack,open draught,2drink draught,drop empty draught,close draught,put draught in bag,close bag,put draught in cloak,put draught in pack;ww} $CLASS
+#TR {Party say from @PartyLeader:%sgo heal$} {r1;#WAIT 1000;ok;brb;ActionAdd "#WALK @r1";HealMe} $CLASS
+#TR {Party say from @PartyLeader:%sgo heal yourself} {r1;#WAIT 1000;ok;brb;#WAIT 1000;ActionAdd "gor1";HealMe} $CLASS
+
+
+//Mounts
+#TR {Party say from @PartyLeader:%shitch$} {#WAIT 100;hh} $CLASS
+#TR {Party say from @PartyLeader:%smount up$} {mm} $CLASS
+#TR {Party say from @PartyLeader:%sdismount$} {#WAIT 100;dismount} $CLASS
+#TR {Party say from @PartyLeader:%sleave mount$} {do dismount,lead} $CLASS
+#TR {Party say from @PartyLeader:%slead {"horse|warg"}$} {do dismount,lead @MyMount} $CLASS
+#TR {Party say from @PartyLeader:%sallow party$} {#WAIT 500;allow party} $CLASS
+#TR {Party say from @PartyLeader:%s{"harwag|harness|harness wagon|harness your wagon|get your wagon"}$} {#WAIT 200;harwag;#IF (@MyProf!=rider) {dismount}} $CLASS
+#TR {Party say from @PartyLeader:%sleave wagon$} {do dismount,unharness @MyWagon from @MyMount,mount @MyMount} $CLASS
+
+//Map Positioning and syncing
+#TR {@PartyLeader scales the mountain carefull.} {TE DreybanCamp} $CLASS
+#TR {@PartyLeader attacks Labek.} {#TE labek} $CLASS
+#TR {@PartyLeader attacks {"Agrimar|Scrabah"}} {TE agrimar} $CLASS
+#TR {@PartyLeader attacks Ar-Grephil.} {TE gws} $CLASS
+#TR {@PartyLeader attacks Skarabash.} {TE Skarabash} $CLASS
+#TR {@PartyLeader attacks {"Ghalib|Rhajib|Khanib|Dhanib"}} {TE GhalibTent} $CLASS
+
+#TR Baraddur_ClimbWall {@PartyLeader begins to climb the wall.} {#IF (%ismember(%roomname()"Near the outer wall of Barad-dur|A vast and dismal courtyard")) {climb wall}} $CLASS
+#TR Baraddur_ClimbIntoCourtyard1 {@PartyLeader grabs the side of the wall and starts to climb down.} {climb into courtyard} $CLASS
+#TR Baraddur_ClimbIntoCourtyard2 {@PartyLeader leaves down.} {#IF (%roomname()="Atop the outer wall of Barad-dur") {climb into courtyard}} $CLASS
+
+//Disguise
+#TR {Party say from @PartyLeader:%sdisguise demonic} {DisguiseDemonic} $CLASS
+#TR {Party say from @PartyLeader:%sdisguise angelic} {DisguiseAngelic} $CLASS
+
+//Sell
+#TR {Party say from @PartyLeader: sell %1} {do untag %1,sell %1} $CLASS
+#TR {Party say from @PartyLeader: %1, sell %1} {#IF (%lower(@MyName)=%lower(%1)) {do untag %2,sell %2}} $CLASS
+
+BotOff PartyBitch
+#CLASS 0
