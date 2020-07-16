@@ -1,4 +1,4 @@
-#CLASS 0
+//RESET_PartyBitchEXE#CLASS 0#AL RESET_PartyBitchEXE {#CLASS 0
 $CLASS = "Tools|PartyBitch|EXE"
 #AL BitchOn {
 #T+ PartyBitch|Settings
@@ -178,4 +178,4 @@ party say mordorpw @mordorpw
 
 #TR {Party say from @PartyLeader*: {"bribe|bribe orc"}} {bribe orc} $CLASS
 
-#CLASS 0
+#CLASS 0} _PartyBitch#CLASS 0
