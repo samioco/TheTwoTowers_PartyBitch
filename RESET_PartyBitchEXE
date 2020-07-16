@@ -1,0 +1,181 @@
+#CLASS 0
+$CLASS = "Tools|PartyBitch|EXE"
+#AL BitchOn {
+#T+ PartyBitch|Settings
+#IF (%0) {#VAR PartyLeader {%proper(%0)} {} VAR}
+#VAR PartyBitch {1} {} VAR
+SysMsg PartyBitch ON! Leader:  @PartyLeader
+LookBusy 1000
+} $CLASS
+
+#AL BitchOff {
+#T- PartyBitch|Settings
+#VAR PartyBitch {} {} VAR
+SysMsg PartyBitch OFF!
+FollowOff
+} $CLASS
+
+#AL SetLeader {
+#VAR PartyLeader {%proper(%0)} {} VAR
+SysMsg Party Leader set to:  @PartyLeader
+} $CLASS
+
+#AL PartyStat {
+SysMsg PK status: @PK, PARTY status:  @Party, BITCH status:  @PartyBitch, FOLLOW status:  @FollowBot, PartyLeader:  @PartyLeader
+$str=""
+#IF (@Gear_Wagon) {$str=%concat(@MyWagon)}
+#IF (@Gear_PartyWagons) {#IF ($str) {$str=%concat($str,"|")}
+$str=%concat($str,@Gear_PartyWagons)}
+SysMsg Wagons: $str
+} $CLASS
+
+$CLASS = "Tools|PartyBitch|Global"
+//Global PartyBitch Settings
+#TR {({@ProfileGods}) invited you to join {"his|her"} party.} {
+party join %lower(%1)
+} $CLASS
+
+#TR {You join %1'{"s|"} party.} {
+#IF (%ismember(%1,@ProfileGods)) {
+  BitchOn %1
+  #IF (@Gear_Wagon) {allow party}
+  party protect
+  FollowOn
+} {BitchOff}
+} $CLASS
+
+#TR {Your party has been disbanded.} {
+#IF (%class(PartyBitch|Settings)) {BitchOff;FollowOff;trigger off}
+} $CLASS
+
+#TR {({@ProfileGods}) tells you: love me long time} {
+BitchOn %1
+#WAIT %random(1,3)*1000
+tell %lower(%1) lol ok whatever
+} $CLASS
+
+#TR {Party say from ({@ProfileGods}):%slove me long time} {
+BitchOn %1
+#WAIT %random(1,3)*1000
+nodnod
+} $CLASS
+
+#TR {Party say from ({@ProfileGods}):%s{"leader|pl"} %2$} {
+#IF (@PartyLeader=@MyName) {#IF (%2=me) {party leader %lower(%1)
+BitchOn %1} {party leader %lower(%2)
+BitchOn %2}}
+} $CLASS
+
+#TR {({@ProfileGods}) tells you:%s{"leader|pl"} %2$} {
+#IF (@PartyLeader=@MyName) {#IF (%2="me") {party leader %lower(%1)
+BitchOn %1} {party leader %lower(%2)
+BitchOn %2}}
+} $CLASS
+
+#TR {({@ProfileGods}) says*:%sinvite me} {
+do party form,party invite %lower(%1)
+BitchOn %1
+} $CLASS
+
+#TR {({@ProfileGods}) tells you:%sinvite me} {
+do party form,party invite %lower(%1)
+BitchOn %1
+} $CLASS
+
+#TR {({@ProfileGods}) tells you:%sdisband} {
+disband
+BitchOff
+} $CLASS
+
+#TR {Party say from {@ProfileGods}:%sdisband} {
+disband
+BitchOff
+} $CLASS
+
+
+#TR {You become the new leader of your party.} {
+FollowOff
+} $CLASS
+
+#TR {({@ProfileGods}) becomes the new leader of your party.} {
+BitchOn %1
+#IF (@Gear_Wagon) {allow  %lower(%1)}
+party protect
+FollowOn
+} $CLASS
+
+#TR {You join %1'{"s|"} party.} {#IF (%ismember(%1,@ProfileGods)) {
+BitchOn %1
+#IF (@Gear_Wagon) {allow party}
+party protect
+FollowOn} {BitchOff}
+} $CLASS
+
+//Movement & Positioning
+#TR {Party say from {@ProfileGods}:%sgo drop your shit$} {
+#WAIT 200
+ok
+GoMyBox
+boxall
+stopbusy
+} $CLASS
+
+#TR {{ProfileGods} tells you: go drop your shit} {
+#WAIT 200
+GoMyBox
+boxall
+stopbusy
+} $CLASS
+
+#TR {Party say from {@ProfileGods}:%s{"go|come|meet"} %1$} {
+#WAIT 100
+#IF (%roomid(%1)) {#WALK %1}
+} $CLASS
+
+#TR {({@ProfileGods}) tells you: {"go|come|meet"} %2$} {
+tell %lower(%1) ok
+#WAIT 100
+#IF (%roomid(%2)) {#WALK %2}
+} $CLASS
+
+#TR {{@ProfileGods} tells you:%sGoSP$} {
+#WAIT 100
+GoSP
+} $CLASS
+
+#TR {Party say from {@ProfileGods}:%sGoSP$} {
+#WAIT 100
+GoSP
+} $CLASS
+
+#TR {Party say from {@ProfileGods}: where {"are|r"} {"you|u|we"}$} {
+#IF (%roomid()) {party say %roomid} {party say %roomnum()}
+} $CLASS
+
+#TR {({@ProfileGods}) tells you: where {"are|r"} {"you|u|we"}$} {
+#IF (%roomid()) {tell %lower(%1) %roomid} {tell %lower(%1) %roomnum}
+} $CLASS
+
+#TR {{@ProfileGods} joins your party.} {
+allow party
+party protect
+} $CLASS
+
+#TR {Party say from {@ProfileGods}: PKPrep} {
+PKPrep
+} $CLASS
+
+
+//Mordor PW
+#TR {{@ProfileGods} tells you:%smordorpw %1} {
+#VAR MordorPW {%lower(%1)} {} VAR
+} $CLASS
+
+#TR {Party say from {@ProfileGods}:%smordorpw %1} {
+#VAR MordorPW {%lower(%1)} {} VAR
+party say mordorpw @mordorpw
+} $CLASS
+
+#TR {Party say from @PartyLeader*: {"bribe|bribe orc"}} {bribe orc} $CLASS
+
+#CLASS 0
